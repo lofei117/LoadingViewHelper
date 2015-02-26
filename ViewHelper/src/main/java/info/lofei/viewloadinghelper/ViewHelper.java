@@ -15,22 +15,7 @@ public class ViewHelper {
      * Set loading State for the specific view.
      * <p>
      * This method would create a new {@link android.widget.ProgressBar} with same {@link android.view.ViewGroup.LayoutParams} with the <b><span style="color:blue">view</span></b>.
-     * And saved the reference of the ProgressBar using the method {@link android.view.View#setTag(Object obj)}.
-     * <p>If you want to use the original tag, see below sample code:</p>
-     *     <code>
-     *         <pre>
-     *             if(view.getTag() instanceof WrappedTag) {
-     *                 WrappedTag wrappedTag = (WrappedTag)view.getTag();
-     *                 Object tag = wrappedTag.getOriginTag();
-     *
-     *                 // do something with the original tag...
-     *
-     *             } else {
-     *                 // do something with the original tag...
-     *             }
-     *
-     *         </pre>
-     *     </code>
+     * And saved the reference of the ProgressBar using the method {@link android.view.View#setTag(int key, Object obj)}.
      * @param context
      * @param view
      * @param isLoading
@@ -41,9 +26,9 @@ public class ViewHelper {
         }
 
         if(isLoading) {
-            if(view.getTag() instanceof WrappedTag) {
-                WrappedTag wrappedTag = (WrappedTag) view.getTag();
-                ProgressBar progressBar = wrappedTag.getProgressBar();
+            Object pgbTag = view.getTag(R.id.loadinghelper_progressbar_id);
+            if(pgbTag instanceof ProgressBar) {
+                ProgressBar progressBar = (ProgressBar) pgbTag;
                 if(progressBar != null) {
                     view.setEnabled(false);
                     view.setVisibility(View.INVISIBLE);
@@ -53,62 +38,29 @@ public class ViewHelper {
             }
             if(view.getParent() != null) {
                 ViewGroup parent = (ViewGroup) view.getParent();
-                Object originTag = view.getTag();
 
                 ProgressBar progressBar = new ProgressBar(context);
                 progressBar.setIndeterminate(true);
-
-                // set your custom indetermindate drawable here
-//                Drawable drawable = context.getResources().getDrawable(R.drawable.progress);
-//                progressBar.setIndeterminateDrawable(drawable);
-
+                
                 progressBar.setLayoutParams(view.getLayoutParams());
 
                 parent.addView(progressBar);
 
-                WrappedTag wrappedTag = new WrappedTag();
-                wrappedTag.setOriginTag(originTag);
-                wrappedTag.setProgressBar(progressBar);
-
-                view.setTag(wrappedTag);
+                view.setTag(R.id.loadinghelper_progressbar_id, progressBar);
                 view.setEnabled(false);
                 view.setVisibility(View.INVISIBLE);
             }
 
         } else {
-            if(view.getTag() instanceof WrappedTag) {
-                WrappedTag wrappedTag = (WrappedTag) view.getTag();
-                ProgressBar progressBar = wrappedTag.getProgressBar();
+            Object pgbTag = view.getTag(R.id.loadinghelper_progressbar_id);
+            if(pgbTag instanceof ProgressBar) {
+                ProgressBar progressBar = (ProgressBar) pgbTag;
                 if(progressBar != null) {
                     view.setEnabled(true);
                     view.setVisibility(View.VISIBLE);
                     progressBar.setVisibility(View.GONE);
                 }
             }
-        }
-    }
-
-    public static class WrappedTag {
-
-        Object mOriginTag;
-        ProgressBar mProgressBar;
-
-        public WrappedTag(){}
-
-        public Object getOriginTag() {
-            return mOriginTag;
-        }
-
-        public void setOriginTag(Object originTag) {
-            this.mOriginTag = originTag;
-        }
-
-        public ProgressBar getProgressBar() {
-            return mProgressBar;
-        }
-
-        public void setProgressBar(ProgressBar progressBar) {
-            this.mProgressBar = progressBar;
         }
     }
 }
